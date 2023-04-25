@@ -1,4 +1,4 @@
-export interface HekaStateType {
+interface HekaStateType {
   loading: boolean;
   error: string;
   connections: {
@@ -26,6 +26,6 @@ export interface HekaStateType {
     | null;
 }
 
-export type HekaActionType =
+type HekaActionType =
   | { type: 'FETCH_USER_APP'; payload: any }
   | { type: 'FETCH_ERROR'; payload: any };

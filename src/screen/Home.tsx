@@ -1,3 +1,6 @@
+import axios from 'axios';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import React, { useContext } from 'react';
 import {
   ActivityIndicator,
@@ -8,10 +11,13 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { authorize } from 'react-native-app-auth';
+import { connectPlatformAPI } from '../api/connect';
+import { OAuthConfig } from '../constants';
 import { COLOR, FONTSIZE, height, width } from '../theme';
 import { AppContext } from '../utils/AppContext';
-const dayjs = require('dayjs');
-const relativeTime = require('dayjs/plugin/relativeTime');
+import { getRedirectUrl } from '../utils/Authorize';
+
 dayjs.extend(relativeTime);
 
 const modalData: any = {
@@ -34,59 +40,125 @@ const modalData: any = {
 };
 
 const Home: React.FC = () => {
-  const { state } = useContext(AppContext);
+  const { state, dispatch } = useContext(AppContext);
+
+  const handleConnection = async ({
+    platformName,
+  }: {
+    platformName: string;
+  }) => {
+    try {
+      const platform = state.enabled_platforms?.find(
+        (platform) => platform.platform_name === platformName
+      );
+
+      if (!platform) {
+        dispatch({
+          type: 'FETCH_ERROR',
+          payload: { error: 'Invalid platform' },
+        });
+        return;
+      }
+
+      const clientId =
+        platform.platform_app_id ||
+        '414785237708-abirasrhk7fb10fpoijkh33g5ek50pbi.apps.googleusercontent.com';
+      if (!clientId) {
+        dispatch({
+          type: 'FETCH_ERROR',
+          payload: { error: 'ClientID is not present' },
+        });
+        return;
+      }
+
+      const redirectUrl = getRedirectUrl(clientId);
+      const result = await authorize({
+        issuer: OAuthConfig.issuer,
+        clientId,
+        redirectUrl,
+        scopes: platform.enabled_scopes || OAuthConfig.scopes,
+      });
+      console.log({ result });
+
+      const connectResult = await connectPlatformAPI({
+        email: 'abdulmateen075@gmail.com',
+        userUUID: 'abdulmateen075@gmail.com',
+        platformName,
+        refresh_token: result.refreshToken,
+      });
+
+      console.log({ connectResult });
+    } catch (error) {
+      console.error(error);
+      if (axios.isAxiosError(error)) {
+        dispatch({
+          type: 'FETCH_ERROR',
+          payload: { error: error.response?.data?.error },
+        });
+        return;
+      }
+
+      dispatch({ type: 'FETCH_ERROR', payload: null });
+    }
+  };
+
+  if (state.loading) {
+    return (
+      <ActivityIndicator
+        size="large"
+        color={COLOR.blue}
+        style={{ marginTop: height / 2 - height / 14 }}
+      />
+    );
+  }
 
   return (
     <View style={styles.homeContainer}>
-      {state.loading ? (
-        <ActivityIndicator
-          size="large"
-          color={COLOR.blue}
-          style={{ marginTop: height / 2 - height / 14 }}
-        />
-      ) : (
-        <View>
-          {/* {JSON.stringify(state.connections[Object.keys(state.connections)[1]])} */}
-          <FlatList
-            data={state.connections && Object.keys(state.connections)}
-            contentContainerStyle={styles.cardContainer}
-            keyExtractor={(item) => item}
-            ListFooterComponent={() => {
-              return (
-                <View style={styles.footer}>
-                  <Text style={styles.footerText}>
-                    Powered by <Text style={styles.footerTittle}>Heka</Text>
-                  </Text>
-                </View>
-              );
-            }}
-            renderItem={({ item }) => (
-              <View style={styles.card}>
-                <View style={styles.cardLogo}>
-                  <Image style={styles.image} source={modalData[item].logo} />
-                </View>
-                <View style={styles.cardText}>
-                  <Text style={styles.cardTittle}>{modalData[item].name}</Text>
-                  <Text style={styles.cardStatus}>
-                    {state?.connections?.[item].logged_in
-                      ? dayjs(state.connections[item].last_sync).fromNow()
-                      : 'Logged Out'}
-                  </Text>
-                </View>
-                <TouchableOpacity style={styles.cardButton}>
-                  <Text style={styles.buttonText}>
-                    {state?.connections?.[item].connected_device_uuids.length
-                      ? 'Connect'
-                      : state.connections?.[item].logged_in
-                      ? 'Disconnect'
-                      : 'Connect again'}
-                  </Text>
-                </TouchableOpacity>
+      <View>
+        <FlatList
+          data={state?.connections && Object.keys(state.connections)}
+          contentContainerStyle={styles.cardContainer}
+          keyExtractor={(item) => item}
+          ListFooterComponent={() => {
+            return (
+              <View style={styles.footer}>
+                {state.error ? <Text>{state.error}</Text> : null}
+
+                <Text style={styles.footerText}>
+                  Powered by <Text style={styles.footerTittle}>Heka</Text>
+                </Text>
               </View>
-            )}
-          />
-        </View>
-      )}
+            );
+          }}
+          renderItem={({ item }) => (
+            <View style={styles.card}>
+              <View style={styles.cardLogo}>
+                <Image style={styles.image} source={modalData[item].logo} />
+              </View>
+              <View style={styles.cardText}>
+                <Text style={styles.cardTittle}>{modalData[item].name}</Text>
+                <Text style={styles.cardStatus}>
+                  {state?.connections?.[item]?.logged_in
+                    ? dayjs(state.connections[item]?.last_sync).fromNow()
+                    : 'Logged Out'}
+                </Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => handleConnection({ platformName: item })}
+                style={styles.cardButton}
+              >
+                <Text style={styles.buttonText}>
+                  {!state?.connections?.[item]
+                    ? 'Connect'
+                    : state.connections[item].logged_in
+                    ? 'Disconnect'
+                    : 'Reconnect'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        />
+      </View>
     </View>
   );
 };
@@ -153,10 +225,14 @@ const styles = StyleSheet.create({
     fontSize: FONTSIZE.mid,
   },
   footer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    flexDirection: 'column',
     alignSelf: 'flex-end',
     margin: 5,
   },
   footerText: {
+    textAlign: 'right',
     color: COLOR.gray,
     fontSize: FONTSIZE.small,
   },

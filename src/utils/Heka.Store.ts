@@ -1,5 +1,4 @@
 import { Reducer } from 'react';
-import { HekaStateType, HekaActionType } from '../types';
 
 export const hekaState: HekaStateType = {
   loading: true,
@@ -25,11 +24,10 @@ export const hekaReducer: Reducer<HekaStateType, HekaActionType> = (
     case 'FETCH_ERROR':
       return {
         loading: false,
-        data: {},
-        connections: null,
-        enabled_data_types: null,
-        enabled_platforms: null,
-        error: 'Something went wrong!',
+        connections: state.connections,
+        enabled_data_types: state.enabled_data_types,
+        enabled_platforms: state.enabled_platforms,
+        error: action.payload?.error || 'Something went wrong!',
       };
     default:
       return state;

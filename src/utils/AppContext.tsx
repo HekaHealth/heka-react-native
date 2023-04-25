@@ -1,7 +1,6 @@
 import axios from 'axios';
 import type { Dispatch } from 'react';
 import React, { createContext, useEffect, useReducer } from 'react';
-import { HekaActionType, HekaStateType } from '../types';
 import { hekaReducer, hekaState } from './Heka.Store';
 
 export const AppContext = createContext<{
@@ -34,7 +33,6 @@ export const AppWrapper: React.FC<AppWrapperProps> = ({ children }) => {
           },
         });
       } catch (error) {
-        console.log({ error });
         dispatch({ type: 'FETCH_ERROR', payload: null });
       }
     })();
