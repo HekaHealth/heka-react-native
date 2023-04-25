@@ -1,13 +1,13 @@
-import { Dimensions } from "react-native";
+import { Dimensions } from 'react-native';
 
-export const { width, height } = Dimensions.get("window");
+export const { width, height } = Dimensions.get('window');
 
 export const COLOR: any = {
-  blue: "#2097f3",
-  white: "#fff",
-  black: "#000",
-  tintOrange: "#f44337",
-  gray: "#747575",
+  blue: '#2097f3',
+  white: '#fff',
+  black: '#000',
+  tintOrange: '#f44337',
+  gray: '#747575',
 };
 
 export const FONTSIZE: any = {

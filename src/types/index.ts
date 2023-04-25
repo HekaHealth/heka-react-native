@@ -1,4 +1,4 @@
-export interface hekaStateType {
+export interface HekaStateType {
   loading: boolean;
   error: string;
   connections: {
@@ -9,19 +9,23 @@ export interface hekaStateType {
       connected_device_uuids: string[];
     };
   } | null;
-  enabled_platforms: {
-    platform_name: string;
-    platform_app_id: string | null;
-    id: number;
-    platform_app_secret: string | null;
-    enabled_scopes: string[] | null;
-  }[] | null;
-  enabled_data_types: {
-    name: string;
-    id: number;
-  }[] | null;
+  enabled_platforms:
+    | {
+        platform_name: string;
+        platform_app_id: string | null;
+        id: number;
+        platform_app_secret: string | null;
+        enabled_scopes: string[] | null;
+      }[]
+    | null;
+  enabled_data_types:
+    | {
+        name: string;
+        id: number;
+      }[]
+    | null;
 }
 
-export type hekaActionType =
-  | { type: "FETCH_USER_APP"; payload: any }
-  | { type: "FETCH_ERROR"; payload: any };
+export type HekaActionType =
+  | { type: 'FETCH_USER_APP'; payload: any }
+  | { type: 'FETCH_ERROR'; payload: any };
