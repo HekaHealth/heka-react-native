@@ -6,46 +6,57 @@ import {
   ActivityIndicator,
   FlatList,
   Image,
+  ImageSourcePropType,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import { authorize } from 'react-native-app-auth';
 import { connectPlatformAPI } from '../api/connect';
-import { OAuthConfig } from '../constants';
+import { useFitbit } from '../hooks/fitbit';
 import { COLOR, FONTSIZE, height, width } from '../theme';
 import { AppContext } from '../utils/AppContext';
-import { getRedirectUrl } from '../utils/Authorize';
+import { useGoogleFit } from '../hooks/googleFit';
 
 dayjs.extend(relativeTime);
 
-const modalData: any = {
-  fitbit: {
-    name: 'Fitbit',
-    logo: require('../images/fitbit.jpg'),
-  },
-  strava: {
-    name: 'Strava',
-    logo: require('../images/strava.png'),
-  },
-  google_fit: {
-    name: 'Google Fit',
-    logo: require('../images/google_fit.png'),
-  },
-  apple_healthkit: {
-    name: 'Apple Health',
-    logo: require('../images/apple_healthkit.png'),
-  },
-};
+const modalData: Record<Provider, { name: string; logo: ImageSourcePropType }> =
+  {
+    fitbit: {
+      name: 'Fitbit',
+      logo: require('../images/fitbit.jpg'),
+    },
+    strava: {
+      name: 'Strava',
+      logo: require('../images/strava.png'),
+    },
+    google_fit: {
+      name: 'Google Fit',
+      logo: require('../images/google_fit.png'),
+    },
+    apple_healthkit: {
+      name: 'Apple Health',
+      logo: require('../images/apple_healthkit.png'),
+    },
+  };
 
 const Home: React.FC = () => {
   const { state, dispatch } = useContext(AppContext);
 
+  const { signIn: signInFitbit } = useFitbit();
+  const { signIn: signInGoogleFit } = useGoogleFit();
+
+  const platformAuthorizeMap: Record<Provider, ProviderSignIn> = {
+    fitbit: signInFitbit,
+    strava: signInFitbit,
+    google_fit: signInGoogleFit,
+    apple_healthkit: signInFitbit,
+  };
+
   const handleConnection = async ({
     platformName,
   }: {
-    platformName: string;
+    platformName: Provider;
   }) => {
     try {
       const platform = state.enabled_platforms?.find(
@@ -60,34 +71,26 @@ const Home: React.FC = () => {
         return;
       }
 
-      const clientId =
-        platform.platform_app_id ||
-        '414785237708-abirasrhk7fb10fpoijkh33g5ek50pbi.apps.googleusercontent.com';
-      if (!clientId) {
+      const authorize = platformAuthorizeMap[platform.platform_name];
+      const { result, error } = await authorize(platform);
+
+      if (!result || error) {
+        console.log({ result, error });
         dispatch({
           type: 'FETCH_ERROR',
-          payload: { error: 'ClientID is not present' },
+          payload: {
+            error: error || 'Failed to sign in, please verify your credentials',
+          },
         });
         return;
       }
 
-      const redirectUrl = getRedirectUrl(clientId);
-      const result = await authorize({
-        issuer: OAuthConfig.issuer,
-        clientId,
-        redirectUrl,
-        scopes: platform.enabled_scopes || OAuthConfig.scopes,
-      });
-      console.log({ result });
-
-      const connectResult = await connectPlatformAPI({
+      await connectPlatformAPI({
         email: 'abdulmateen075@gmail.com',
         userUUID: 'abdulmateen075@gmail.com',
         platformName,
         refresh_token: result.refreshToken,
       });
-
-      console.log({ connectResult });
     } catch (error) {
       console.error(error);
       if (axios.isAxiosError(error)) {
@@ -116,7 +119,11 @@ const Home: React.FC = () => {
     <View style={styles.homeContainer}>
       <View>
         <FlatList
-          data={state?.connections && Object.keys(state.connections)}
+          data={
+            state?.connections
+              ? (Object.keys(state.connections) as Provider[])
+              : []
+          }
           contentContainerStyle={styles.cardContainer}
           keyExtractor={(item) => item}
           ListFooterComponent={() => {

@@ -11,6 +11,10 @@ interface ConnectRequest {
 
 export interface ConnectResponse {
   success: boolean;
+  data: {
+    connections: any[];
+    user_uuid: string;
+  };
 }
 
 export const connectPlatformAPI = async (
