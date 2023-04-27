@@ -37,10 +37,6 @@ export const useFitbit = () => {
         },
         scopes: platform.enabled_scopes || defaultScopes,
       });
-      console.log({
-        refreshToken: result.refreshToken,
-        email: result.tokenAdditionalParameters?.['user_id'] || '',
-      });
 
       return {
         result: {
@@ -49,7 +45,7 @@ export const useFitbit = () => {
         },
       };
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return {};
     }
   };

@@ -79,9 +79,11 @@ const Home = ({ appKey, userUUID }: HomeProps) => {
                   </Text>
 
                   <Text style={styles.cardStatus}>
-                    {connections?.[platformName]?.logged_in
+                    {!connections?.[platformName]?.logged_in
+                      ? 'Logged Out'
+                      : connections[platformName]?.last_sync
                       ? dayjs(connections[platformName]?.last_sync).fromNow()
-                      : 'Logged Out'}
+                      : ''}
                   </Text>
                 </View>
 

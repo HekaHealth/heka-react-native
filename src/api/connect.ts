@@ -29,12 +29,12 @@ export const connectPlatformAPI = async (
       device_id: request.device_id,
       refresh_token: request.refresh_token,
       email: request.email,
+      disconnect: Boolean(request.isDisconnect),
     },
     {
       params: {
         key: request.appKey,
         user_uuid: request.userUUID,
-        disconnect: Boolean(request.isDisconnect),
       },
     }
   );
