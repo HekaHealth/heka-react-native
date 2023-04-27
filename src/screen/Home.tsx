@@ -1,111 +1,38 @@
-import axios from 'axios';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import React, { useContext } from 'react';
+import React from 'react';
 import {
   ActivityIndicator,
   FlatList,
   Image,
-  ImageSourcePropType,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import { connectPlatformAPI } from '../api/connect';
-import { useFitbit } from '../hooks/fitbit';
+import { platformsMeta } from '../constants/platforms';
 import { COLOR, FONTSIZE, height, width } from '../theme';
-import { AppContext } from '../utils/AppContext';
-import { useGoogleFit } from '../hooks/googleFit';
+import { useHome } from './Home.hooks';
 
 dayjs.extend(relativeTime);
 
-const modalData: Record<Provider, { name: string; logo: ImageSourcePropType }> =
-  {
-    fitbit: {
-      name: 'Fitbit',
-      logo: require('../images/fitbit.jpg'),
-    },
-    strava: {
-      name: 'Strava',
-      logo: require('../images/strava.png'),
-    },
-    google_fit: {
-      name: 'Google Fit',
-      logo: require('../images/google_fit.png'),
-    },
-    apple_healthkit: {
-      name: 'Apple Health',
-      logo: require('../images/apple_healthkit.png'),
-    },
-  };
+interface HomeProps {
+  appKey: string;
+  userUUID: string;
+}
 
-const Home: React.FC = () => {
-  const { state, dispatch } = useContext(AppContext);
+const Home = ({ appKey, userUUID }: HomeProps) => {
+  const {
+    isLoadingConnectPlatform,
+    isLoadingUserApps,
+    isLoadingConnections,
+    connections,
+    state,
+    handleConnect,
+    handleDisconnect,
+  } = useHome({ appKey, userUUID });
 
-  const { signIn: signInFitbit } = useFitbit();
-  const { signIn: signInGoogleFit } = useGoogleFit();
-
-  const platformAuthorizeMap: Record<Provider, ProviderSignIn> = {
-    fitbit: signInFitbit,
-    strava: signInFitbit,
-    google_fit: signInGoogleFit,
-    apple_healthkit: signInFitbit,
-  };
-
-  const handleConnection = async ({
-    platformName,
-  }: {
-    platformName: Provider;
-  }) => {
-    try {
-      const platform = state.enabled_platforms?.find(
-        (platform) => platform.platform_name === platformName
-      );
-
-      if (!platform) {
-        dispatch({
-          type: 'FETCH_ERROR',
-          payload: { error: 'Invalid platform' },
-        });
-        return;
-      }
-
-      const authorize = platformAuthorizeMap[platform.platform_name];
-      const { result, error } = await authorize(platform);
-
-      if (!result || error) {
-        console.log({ result, error });
-        dispatch({
-          type: 'FETCH_ERROR',
-          payload: {
-            error: error || 'Failed to sign in, please verify your credentials',
-          },
-        });
-        return;
-      }
-
-      await connectPlatformAPI({
-        email: 'abdulmateen075@gmail.com',
-        userUUID: 'abdulmateen075@gmail.com',
-        platformName,
-        refresh_token: result.refreshToken,
-      });
-    } catch (error) {
-      console.error(error);
-      if (axios.isAxiosError(error)) {
-        dispatch({
-          type: 'FETCH_ERROR',
-          payload: { error: error.response?.data?.error },
-        });
-        return;
-      }
-
-      dispatch({ type: 'FETCH_ERROR', payload: null });
-    }
-  };
-
-  if (state.loading) {
+  if (isLoadingConnections || isLoadingUserApps || isLoadingConnectPlatform) {
     return (
       <ActivityIndicator
         size="large"
@@ -119,11 +46,7 @@ const Home: React.FC = () => {
     <View style={styles.homeContainer}>
       <View>
         <FlatList
-          data={
-            state?.connections
-              ? (Object.keys(state.connections) as Provider[])
-              : []
-          }
+          data={connections ? (Object.keys(connections) as Provider[]) : []}
           contentContainerStyle={styles.cardContainer}
           keyExtractor={(item) => item}
           ListFooterComponent={() => {
@@ -137,33 +60,50 @@ const Home: React.FC = () => {
               </View>
             );
           }}
-          renderItem={({ item }) => (
-            <View style={styles.card}>
-              <View style={styles.cardLogo}>
-                <Image style={styles.image} source={modalData[item].logo} />
+          renderItem={({ item: platformName }) => {
+            const isConnectionMissing = !connections?.[platformName];
+            const isLoggedIn = Boolean(connections?.[platformName]?.logged_in);
+
+            return (
+              <View style={styles.card}>
+                <View style={styles.cardLogo}>
+                  <Image
+                    style={styles.image}
+                    source={platformsMeta[platformName].logo}
+                  />
+                </View>
+
+                <View style={styles.cardText}>
+                  <Text style={styles.cardTittle}>
+                    {platformsMeta[platformName].name}
+                  </Text>
+
+                  <Text style={styles.cardStatus}>
+                    {connections?.[platformName]?.logged_in
+                      ? dayjs(connections[platformName]?.last_sync).fromNow()
+                      : 'Logged Out'}
+                  </Text>
+                </View>
+
+                <TouchableOpacity
+                  style={styles.cardButton}
+                  onPress={
+                    isLoggedIn
+                      ? () => handleDisconnect({ platformName })
+                      : () => handleConnect({ platformName })
+                  }
+                >
+                  <Text style={styles.buttonText}>
+                    {isConnectionMissing
+                      ? 'Connect'
+                      : isLoggedIn
+                      ? 'Disconnect'
+                      : 'Reconnect'}
+                  </Text>
+                </TouchableOpacity>
               </View>
-              <View style={styles.cardText}>
-                <Text style={styles.cardTittle}>{modalData[item].name}</Text>
-                <Text style={styles.cardStatus}>
-                  {state?.connections?.[item]?.logged_in
-                    ? dayjs(state.connections[item]?.last_sync).fromNow()
-                    : 'Logged Out'}
-                </Text>
-              </View>
-              <TouchableOpacity
-                onPress={() => handleConnection({ platformName: item })}
-                style={styles.cardButton}
-              >
-                <Text style={styles.buttonText}>
-                  {!state?.connections?.[item]
-                    ? 'Connect'
-                    : state.connections[item].logged_in
-                    ? 'Disconnect'
-                    : 'Reconnect'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          )}
+            );
+          }}
         />
       </View>
     </View>

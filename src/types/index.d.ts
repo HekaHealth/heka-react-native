@@ -6,6 +6,7 @@ type Platform = {
   platform_app_id: string | null;
   platform_app_secret: string | null;
   enabled_scopes: Array<string> | null;
+  sync_manual_entries: boolean;
 };
 
 type Connection = {
@@ -21,16 +22,10 @@ type DataType = {
 };
 
 type HekaStateType = {
-  loading: boolean;
   error: string;
-  connections: Record<Provider, Connection> | null;
-  enabled_platforms: Array<Platform> | null;
-  enabled_data_types: Array<DataType> | null;
 };
 
-type HekaActionType =
-  | { type: 'FETCH_USER_APP'; payload: any }
-  | { type: 'FETCH_ERROR'; payload: any };
+type HekaActionType = { type: 'APP_ERROR'; payload?: { error?: string } };
 
 type SignInParams = {
   clientId: string;

@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { authorize } from 'react-native-app-auth';
 
 const getRedirectUrl = (clientId: string) => {
@@ -31,22 +32,22 @@ export const useGoogleFit = () => {
       }
 
       const redirectUrl = getRedirectUrl(clientId);
-      console.log({ redirectUrl });
       const result = await authorize({
         issuer,
         clientId,
         redirectUrl,
         scopes: platform.enabled_scopes || defaultScopes,
       });
-      console.log({
-        refreshToken: result.refreshToken,
-        email: result.tokenAdditionalParameters?.['user_id'] || '',
-      });
+
+      const userInfoResult = await axios.get(
+        `https://www.googleapis.com/oauth2/v3/userinfo`,
+        { params: { access_token: result.accessToken } }
+      );
 
       return {
         result: {
           refreshToken: result.refreshToken,
-          email: result.tokenAdditionalParameters?.['user_id'] || '',
+          email: userInfoResult.data?.email || '',
         },
       };
     } catch (error) {
