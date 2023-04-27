@@ -1,24 +1,10 @@
 import { authorize } from 'react-native-app-auth';
 
-const redirectUrl = 'hekahealth://fitbit';
+const redirectUrl = 'hekahealth://strava';
 
-const defaultScopes = [
-  'activity',
-  'cardio_fitness',
-  'electrocardiogram',
-  'heartrate',
-  'location',
-  'nutrition',
-  'profile',
-  'oxygen_saturation',
-  'respiratory_rate',
-  'sleep',
-  'temperature',
-  'weight',
-  'settings',
-];
+const defaultScopes = ['activity:read'];
 
-export const useFitbit = () => {
+export const useStrava = () => {
   const signIn: ProviderSignIn = async (platform) => {
     try {
       const clientId = platform.platform_app_id;
@@ -26,14 +12,14 @@ export const useFitbit = () => {
       if (!clientId || !clientSecret) {
         return { error: 'missing credentials' };
       }
-
       const result = await authorize({
         clientId,
         clientSecret,
         redirectUrl,
         serviceConfiguration: {
-          authorizationEndpoint: 'https://www.fitbit.com/oauth2/authorize',
-          tokenEndpoint: 'https://api.fitbit.com/oauth2/token',
+          authorizationEndpoint:
+            'https://www.strava.com/oauth/mobile/authorize',
+          tokenEndpoint: `https://www.strava.com/oauth/token?client_id=${clientId}&client_secret=${clientSecret}`,
         },
         scopes: platform.enabled_scopes || defaultScopes,
       });
@@ -41,7 +27,9 @@ export const useFitbit = () => {
       return {
         result: {
           refreshToken: result.refreshToken,
-          email: result.tokenAdditionalParameters?.['user_id'] || '',
+          email:
+            (result.tokenAdditionalParameters?.['athlete'] as any)?.['id'] ||
+            '',
         },
       };
     } catch (error) {

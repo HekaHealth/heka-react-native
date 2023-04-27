@@ -8,6 +8,7 @@ import { QueryKeys } from '../constants/queryKeys';
 import { useFitbit } from '../hooks/fitbit';
 import { useGoogleFit } from '../hooks/googleFit';
 import { AppContext } from '../utils/AppContext';
+import { useStrava } from '../hooks/strava';
 
 interface HomeParams {
   appKey: string;
@@ -39,10 +40,11 @@ export const useHome = ({ appKey, userUUID }: HomeParams) => {
 
   const { signIn: signInFitbit } = useFitbit();
   const { signIn: signInGoogleFit } = useGoogleFit();
+  const { signIn: signInStrava } = useStrava();
 
   const platformAuthorizeMap: Record<Provider, ProviderSignIn> = {
     fitbit: signInFitbit,
-    strava: signInFitbit,
+    strava: signInStrava,
     google_fit: signInGoogleFit,
     apple_healthkit: signInFitbit,
   };
@@ -78,15 +80,13 @@ export const useHome = ({ appKey, userUUID }: HomeParams) => {
         return;
       }
 
-      const result2 = await connectPlatformAPI({
+      await connectPlatformAPI({
         appKey,
         userUUID,
         platformName,
         email: 'abdulmateen075@gmail.com',
         refresh_token: result.refreshToken,
       });
-
-      console.log({ result2: result2.data.connections?.[platformName] });
 
       await queryClient.invalidateQueries([QueryKeys.CONNECTIONS]);
     } catch (error) {
