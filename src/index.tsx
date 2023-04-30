@@ -5,12 +5,15 @@ import { AppWrapper } from './utils/AppContext';
 
 const queryClient = new QueryClient();
 
-interface HekaHealthAppProps {
+interface HekaHealthComponentProps {
   appKey: string;
   userUUID: string;
 }
 
-export const HekaHealthApp = ({ appKey, userUUID }: HekaHealthAppProps) => {
+export const HekaHealthComponent = ({
+  appKey,
+  userUUID,
+}: HekaHealthComponentProps) => {
   return (
     <QueryClientProvider client={queryClient}>
       <AppWrapper>
@@ -20,4 +23,4 @@ export const HekaHealthApp = ({ appKey, userUUID }: HekaHealthAppProps) => {
   );
 };
 
-export default HekaHealthApp;
+export default HekaHealthComponent;

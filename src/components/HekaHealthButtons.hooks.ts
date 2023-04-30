@@ -57,7 +57,7 @@ export const useHekaHealthButtons = ({ appKey, userUUID }: HomeParams) => {
   }) => {
     try {
       const platform = enabledPlatforms?.find(
-        (platform) => platform.platform_name === platformName
+        (enabledPlatform) => enabledPlatform.platform_name === platformName
       );
 
       if (!platform) {
@@ -111,7 +111,7 @@ export const useHekaHealthButtons = ({ appKey, userUUID }: HomeParams) => {
   }) => {
     try {
       const platform = enabledPlatforms?.find(
-        (platform) => platform.platform_name === platformName
+        (enabledPlatform) => enabledPlatform.platform_name === platformName
       );
 
       if (!platform) {
