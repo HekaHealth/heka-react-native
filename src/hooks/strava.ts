@@ -1,4 +1,5 @@
 import { authorize } from 'react-native-app-auth';
+import { ProviderSignIn } from '../types';
 
 const redirectUrl = 'hekahealth://strava';
 

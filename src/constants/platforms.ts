@@ -1,7 +1,8 @@
 import { ImageSourcePropType } from 'react-native/types';
+import { HekaProvider } from '../types';
 
 export const platformsMeta: Record<
-  Provider,
+  HekaProvider,
   { name: string; logo: ImageSourcePropType }
 > = {
   fitbit: {

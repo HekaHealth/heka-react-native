@@ -4,8 +4,9 @@ import {
   UseQueryOptions,
   UseQueryResult,
 } from '@tanstack/react-query';
-import { api } from '.';
+import { api } from './index';
 import { QueryKeys } from '../constants/queryKeys';
+import { DataType, Platform } from '../types';
 
 interface Request {
   appKey: string;

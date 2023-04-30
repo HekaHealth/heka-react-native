@@ -1,4 +1,5 @@
 import { Reducer } from 'react';
+import { HekaStateType, HekaActionType } from '../types';
 
 export const hekaState: HekaStateType = {
   error: '',

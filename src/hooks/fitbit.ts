@@ -1,4 +1,5 @@
 import { authorize } from 'react-native-app-auth';
+import { ProviderSignIn } from '../types';
 
 const redirectUrl = 'hekahealth://fitbit';
 
@@ -41,7 +42,7 @@ export const useFitbit = () => {
       return {
         result: {
           refreshToken: result.refreshToken,
-          email: result.tokenAdditionalParameters?.['user_id'] || '',
+          email: result.tokenAdditionalParameters?.user_id || '',
         },
       };
     } catch (error) {

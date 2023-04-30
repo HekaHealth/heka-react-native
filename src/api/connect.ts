@@ -1,5 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
-import { api } from '.';
+import { api } from './index';
+import { HekaProvider, Connection } from '../types';
 
 interface ConnectRequest {
   appKey: string;
@@ -14,7 +15,7 @@ interface ConnectRequest {
 export interface ConnectResponse {
   success: boolean;
   data: {
-    connections: Record<Provider, Connection> | null;
+    connections: Record<HekaProvider, Connection> | null;
     user_uuid: string;
   };
 }

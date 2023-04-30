@@ -1,6 +1,7 @@
 import type { Dispatch } from 'react';
 import React, { createContext, useReducer } from 'react';
 import { hekaReducer, hekaState } from './Heka.Store';
+import { HekaStateType, HekaActionType } from '../types';
 
 export const AppContext = createContext<{
   state: HekaStateType;

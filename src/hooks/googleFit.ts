@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { authorize } from 'react-native-app-auth';
+import { ProviderSignIn } from '../types';
 
 const getRedirectUrl = (clientId: string) => {
   const parts = clientId.split('.');

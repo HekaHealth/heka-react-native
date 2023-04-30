@@ -4,8 +4,9 @@ import {
   UseQueryOptions,
   UseQueryResult,
 } from '@tanstack/react-query';
-import { api } from '.';
+import { api } from './index';
 import { QueryKeys } from '../constants/queryKeys';
+import { HekaProvider, Connection } from '../types';
 
 interface Request {
   userUUID: string;
@@ -16,7 +17,7 @@ interface Response {
   success: boolean;
   data: {
     user_uuid: string;
-    connections: Record<Provider, Connection> | null;
+    connections: Record<HekaProvider, Connection> | null;
   };
 }
 
