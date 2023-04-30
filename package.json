@@ -1,5 +1,5 @@
 {
-  "name": "heka-health-react-native-plugin",
+  "name": "@heka-health/heka-react-native",
   "version": "0.1.0",
   "description": "Heka Health React Native Plugin",
   "main": "lib/commonjs/index",
@@ -41,13 +41,13 @@
     "ios",
     "android"
   ],
-  "repository": "https://github.com/theabdulmateen/heka-health-react-native-plugin",
-  "author": "abdul mateen <abdulmateen075@gmail.com> (https://github.com/theabdulmateen)",
+  "repository": "https://github.com/HekaHealth/heka-react-native",
+  "author": "heka <contact@hekahealth.co> (https://github.com/hekahealth)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/theabdulmateen/heka-health-react-native-plugin/issues"
+    "url": "https://github.com/HekaHealth/heka-react-native/issues"
   },
-  "homepage": "https://github.com/theabdulmateen/heka-health-react-native-plugin#readme",
+  "homepage": "https://github.com/HekaHealth/heka-react-native#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
