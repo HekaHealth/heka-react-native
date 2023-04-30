@@ -82,7 +82,11 @@
   },
   "peerDependencies": {
     "react": "*",
-    "react-native": "*"
+    "react-native": "*",
+    "react-native-app-auth": "*",
+    "@tanstack/react-query": "*",
+    "axios": "*",
+    "dayjs": "*"
   },
   "engines": {
     "node": ">= 16.0.0"
