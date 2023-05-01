@@ -10,6 +10,7 @@ import { useGoogleFit } from '../hooks/googleFit';
 import { AppContext } from '../utils/AppContext';
 import { useStrava } from '../hooks/strava';
 import { HekaProvider, ProviderSignIn } from '../types';
+import { getPlatforms } from '../utils/Platforms';
 
 interface HomeParams {
   appKey: string;
@@ -38,6 +39,7 @@ export const useHekaHealthButtons = ({ appKey, userUUID }: HomeParams) => {
 
   const connections = connectionsResponse?.data?.connections;
   const enabledPlatforms = userAppsResponse?.data?.enabled_platforms || [];
+  const platforms = getPlatforms(connections);
 
   const { signIn: signInFitbit } = useFitbit();
   const { signIn: signInGoogleFit } = useGoogleFit();
@@ -150,6 +152,7 @@ export const useHekaHealthButtons = ({ appKey, userUUID }: HomeParams) => {
     isLoadingConnectPlatform,
     state,
     connections,
+    platforms,
     handleConnect,
     handleDisconnect,
   };

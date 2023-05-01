@@ -1,2 +1,2 @@
-export const AppKey = '948d7579-6476-4ab4-8ed9-53f9a54ad300';
-export const UserUUID = 'abdulmateen075@gmail.com';
+export const AppKey = '<YOUR_APP_KEY>';
+export const UserUUID = '<YOUR_USER_UUID>';

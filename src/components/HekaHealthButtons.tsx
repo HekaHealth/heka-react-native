@@ -13,7 +13,6 @@ import {
 import { platformsMeta } from '../constants/platforms';
 import { COLOR, FONTSIZE, height, width } from '../theme';
 import { useHekaHealthButtons } from './HekaHealthButtons.hooks';
-import { HekaProvider } from '../types';
 
 dayjs.extend(relativeTime);
 
@@ -31,6 +30,7 @@ export const HekaHealthButtons = ({
     isLoadingUserApps,
     isLoadingConnections,
     connections,
+    platforms,
     state,
     handleConnect,
     handleDisconnect,
@@ -50,7 +50,7 @@ export const HekaHealthButtons = ({
     <View style={styles.homeContainer}>
       <View>
         <FlatList
-          data={connections ? (Object.keys(connections) as HekaProvider[]) : []}
+          data={platforms}
           contentContainerStyle={styles.cardContainer}
           keyExtractor={(item) => item}
           ListFooterComponent={() => {

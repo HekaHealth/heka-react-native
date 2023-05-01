@@ -1,5 +1,5 @@
 {
-  "name": "HekaHealthReactNativePluginExample",
+  "name": "heka-react-native-example",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -9,6 +9,9 @@
     "pods": "pod-install --quiet"
   },
   "dependencies": {
+    "@tanstack/react-query": "^4.29.5",
+    "axios": "^1.4.0",
+    "dayjs": "^1.11.7",
     "react": "18.2.0",
     "react-native": "0.71.7",
     "react-native-app-auth": "^6.4.3"

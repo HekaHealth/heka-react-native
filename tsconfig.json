@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
-      "heka-health-react-native-plugin": [
+      "@heka-health/heka-react-native": [
         "./src/index"
       ]
     },
