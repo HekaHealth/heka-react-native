@@ -107,12 +107,12 @@ func application(_ application: UIApplication,
 ## Usage
 
 ```typescript
-import { HekaHealthComponent } from '@heka-health/heka-react-native';
+import { HekaComponent } from '@heka-health/heka-react-native';
 
 const appKey = 'YOUR_API_KEY';
 const userUUID = 'YOUR_USER_UUID';
 
-<HekaHealthComponent appKey={appKey} userUUID={userUUID} />;
+<HekaComponent appKey={appKey} userUUID={userUUID} />;
 ```
 
 The `userUuid` is a unique user identifier that you use across your app. We don't store any user personal information of your users and will link their health data to this uuid.
