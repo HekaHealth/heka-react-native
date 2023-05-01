@@ -72,38 +72,6 @@ Now add the whole activity inside the application. Make sure this activity is no
 
 There are other simpler ways to set up app redirect URLs, however, this method is recommended to support multiple redirect URLs for various platforms like Fitbit, Strava etc.
 
-#### Apple Healthkit
-
-> Note: This is only supported on iOS.
-
-1. Append the `Info.plist` with the following 2 entries:
-
-```
-<key>NSHealthShareUsageDescription</key>
-<string>We will sync your data with the Apple Health app to give you better insights</string>
-<key>NSHealthUpdateUsageDescription</key>
-<string>We will sync your data with the Apple Health app to give you better insights</string>
-```
-
-2. Enabling HealthKit requires the following two steps in `Xcode`:
-
-- Go to the `Signing & Capabilities` tab of the Runner target's settings and add the `HealthKit` capability.
-- Enable the background delivery option for `HealthKit`.
-
-3. To make sure that health data is being synced even while on background, initialize the sync observers in `application:didFinishLaunchingWithOptions` method of `AppDelegate.swift`:
-
-```swift
-import HekaCore // Make sure you import HekaCore
-// ...
-
-func application(_ application: UIApplication,
-    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-    // ....
-    HekaManager().installObservers()
-    return super.application(application, didFinishLaunchingWithOptions: launchOptions)
-}
-```
-
 ## Usage
 
 ```typescript
