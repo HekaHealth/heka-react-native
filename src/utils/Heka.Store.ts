@@ -1,0 +1,20 @@
+import { Reducer } from 'react';
+import { HekaStateType, HekaActionType } from '../types';
+
+export const hekaState: HekaStateType = {
+  error: '',
+};
+
+export const hekaReducer: Reducer<HekaStateType, HekaActionType> = (
+  state,
+  action
+) => {
+  switch (action.type) {
+    case 'APP_ERROR':
+      return {
+        error: action.payload?.error || 'Something went wrong!',
+      };
+    default:
+      return state;
+  }
+};
