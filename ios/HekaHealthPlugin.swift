@@ -7,8 +7,8 @@ class HekaHealthPlugin: NSObject {
   private let hekaManager = HekaManager()
 
   @objc
-  func syncIosHealthData(_ apiKey: String, userUuid: String, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
-    hekaManager.syncIosHealthData(apiKey: apiKey, userUuid: userUuid) { success in
+  func syncIosHealthData(_ apiKey: String, userUuid: String, lastSyncDate: Date? = nil, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
+    hekaManager.syncIosHealthData(apiKey: apiKey, userUuid: userUuid, lastSyncDate: lastSyncDate) { success in
       if success {
         resolve(true)
       } else {

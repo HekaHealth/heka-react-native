@@ -5,6 +5,7 @@ const { HekaHealthPlugin } = NativeModules;
 interface SyncIosHealthDataParams {
   appKey: string;
   userUUID: string;
+  lastSyncDate: Date | null;
 }
 
 export const useAppleHealthkit = () => {
@@ -25,9 +26,11 @@ export const useAppleHealthkit = () => {
   const syncIosHealthData = async ({
     appKey,
     userUUID,
+    lastSyncDate,
   }: SyncIosHealthDataParams) => {
     try {
-      await HekaHealthPlugin.syncIosHealthData(appKey, userUUID);
+      await HekaHealthPlugin.syncIosHealthData(appKey, userUUID, lastSyncDate);
+
       return { success: true, error: null };
     } catch (error: any) {
       return { success: false, error: error.message };

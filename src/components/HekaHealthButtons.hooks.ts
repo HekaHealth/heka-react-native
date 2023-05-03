@@ -124,6 +124,12 @@ export const useHekaHealthButtons = ({ appKey, userUUID }: HomeParams) => {
         const syncResult = await syncIosHealthDataAppleHealthKit({
           appKey,
           userUUID,
+          lastSyncDate:
+            state.connections &&
+            state.connections[platformName] &&
+            state.connections[platformName].last_sync
+              ? new Date(state.connections[platformName].last_sync!)
+              : null,
         });
 
         if (syncResult.error) {
