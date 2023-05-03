@@ -1,5 +1,3 @@
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
 import React from 'react';
 import {
   ActivityIndicator,
@@ -12,9 +10,9 @@ import {
 } from 'react-native';
 import { platformsMeta } from '../constants/platforms';
 import { COLOR, FONTSIZE, height, width } from '../theme';
+import { DateUtil } from '../utils/Date';
+import { HekaFooter } from './HekaFooter';
 import { useHekaHealthButtons } from './HekaHealthButtons.hooks';
-
-dayjs.extend(relativeTime);
 
 interface HekaHealthButtonsProps {
   appKey: string;
@@ -53,17 +51,7 @@ export const HekaHealthButtons = ({
           data={platforms}
           contentContainerStyle={styles.cardContainer}
           keyExtractor={(item) => item}
-          ListFooterComponent={() => {
-            return (
-              <View style={styles.footer}>
-                {state.error ? <Text>{state.error}</Text> : null}
-
-                <Text style={styles.footerText}>
-                  Powered by <Text style={styles.footerTittle}>Heka</Text>
-                </Text>
-              </View>
-            );
-          }}
+          ListFooterComponent={<HekaFooter error={state.error} />}
           renderItem={({ item: platformName }) => {
             const isConnectionMissing = !connections?.[platformName];
             const isLoggedIn = Boolean(connections?.[platformName]?.logged_in);
@@ -86,7 +74,9 @@ export const HekaHealthButtons = ({
                     {!connections?.[platformName]?.logged_in
                       ? 'Logged Out'
                       : connections[platformName]?.last_sync
-                      ? dayjs(connections[platformName]?.last_sync).fromNow()
+                      ? `Last Synced: ${DateUtil.formatDate(
+                          new Date(connections[platformName]?.last_sync || '')
+                        )}`
                       : ''}
                   </Text>
                 </View>
@@ -175,22 +165,6 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: COLOR.white,
-    fontSize: FONTSIZE.mid,
-  },
-  footer: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    flexDirection: 'column',
-    alignSelf: 'flex-end',
-    margin: 5,
-  },
-  footerText: {
-    textAlign: 'right',
-    color: COLOR.gray,
-    fontSize: FONTSIZE.small,
-  },
-  footerTittle: {
-    color: COLOR.blue,
     fontSize: FONTSIZE.mid,
   },
 });
