@@ -26,13 +26,29 @@ export type DataType = {
 };
 
 export type HekaStateType = {
+  connections: Record<HekaProvider, Connection> | null;
+  enabledPlatforms: Array<Platform>;
+  isLoading: boolean;
   error: string;
 };
 
-export type HekaActionType = {
-  type: 'APP_ERROR';
-  payload?: { error?: string };
-};
+export type HekaActionType =
+  | {
+      type: 'APP_ERROR';
+      payload?: { error?: string };
+    }
+  | {
+      type: 'SET_CONNECTIONS';
+      payload: { connections: Record<HekaProvider, Connection> | null };
+    }
+  | {
+      type: 'SET_ENABLED_PLATFORMS';
+      payload: { enabledPlatforms: Array<Platform> };
+    }
+  | {
+      type: 'SET_ISLOADING';
+      payload: { isLoading: boolean };
+    };
 
 export type SignInParams = {
   clientId: string;

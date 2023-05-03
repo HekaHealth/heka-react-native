@@ -1,6 +1,5 @@
-import { useMutation } from '@tanstack/react-query';
-import { api } from './index';
 import { HekaProvider, Connection } from '../types';
+import { BaseURL } from '../constants';
 
 interface ConnectRequest {
   appKey: string;
@@ -23,26 +22,24 @@ export interface ConnectResponse {
 export const connectPlatformAPI = async (
   request: ConnectRequest
 ): Promise<ConnectResponse> => {
-  const result = await api.post(
-    `/connect_platform_for_user`,
+  const result = await fetch(
+    `${BaseURL}/connect_platform_for_user?key=${encodeURIComponent(
+      request.appKey
+    )}&user_uuid=${encodeURIComponent(request.userUUID)}`,
     {
-      platform: request.platformName,
-      device_id: request.device_id,
-      refresh_token: request.refresh_token,
-      email: request.email,
-      disconnect: Boolean(request.isDisconnect),
-    },
-    {
-      params: {
-        key: request.appKey,
-        user_uuid: request.userUUID,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
+      body: JSON.stringify({
+        platform: request.platformName,
+        device_id: request.device_id,
+        refresh_token: request.refresh_token,
+        email: request.email,
+        disconnect: Boolean(request.isDisconnect),
+      }),
     }
   );
 
-  return result.data;
-};
-
-export const useConnectPlatformAPI = () => {
-  return useMutation(connectPlatformAPI);
+  return await result.json();
 };

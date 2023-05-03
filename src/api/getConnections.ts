@@ -1,12 +1,5 @@
-import {
-  QueryKey,
-  useQuery,
-  UseQueryOptions,
-  UseQueryResult,
-} from '@tanstack/react-query';
-import { api } from './index';
-import { QueryKeys } from '../constants/queryKeys';
-import { HekaProvider, Connection } from '../types';
+import { BaseURL } from '../constants';
+import { Connection, HekaProvider } from '../types';
 
 interface Request {
   userUUID: string;
@@ -24,23 +17,14 @@ interface Response {
 export const getConnectionsAPI = async (
   request: Request
 ): Promise<Response> => {
-  const result = await api.get(`/check_watch_connection`, {
-    params: {
-      key: request.appKey,
-      user_uuid: request.userUUID,
-    },
-  });
-
-  return result.data;
-};
-
-export const useGetConnectionsAPI = (
-  request: Request,
-  options?: UseQueryOptions<Response>
-): UseQueryResult<Response> => {
-  return useQuery(
-    [QueryKeys.CONNECTIONS, request.appKey, request.userUUID] as QueryKey,
-    () => getConnectionsAPI(request),
-    options
+  const result = await fetch(
+    `${BaseURL}/check_watch_connection?key=${encodeURIComponent(
+      request.appKey
+    )}&user_uuid=${encodeURIComponent(request.userUUID)}`,
+    {
+      method: 'GET',
+    }
   );
+
+  return await result.json();
 };

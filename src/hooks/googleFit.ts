@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { authorize } from 'react-native-app-auth';
 import { ProviderSignIn } from '../types';
 
@@ -40,15 +39,21 @@ export const useGoogleFit = () => {
         scopes: platform.enabled_scopes || defaultScopes,
       });
 
-      const userInfoResult = await axios.get(
-        `https://www.googleapis.com/oauth2/v3/userinfo`,
-        { params: { access_token: result.accessToken } }
+      const userInfoResult = await fetch(
+        `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${encodeURIComponent(
+          result.accessToken
+        )}`,
+        {
+          method: 'GET',
+        }
       );
+
+      const userInfo = await userInfoResult.json();
 
       return {
         result: {
           refreshToken: result.refreshToken,
-          email: userInfoResult.data?.email || '',
+          email: userInfo.data?.email || '',
         },
       };
     } catch (error) {

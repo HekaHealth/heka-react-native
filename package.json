@@ -56,11 +56,9 @@
     "@evilmartians/lefthook": "^1.2.2",
     "@react-native-community/eslint-config": "^3.0.2",
     "@release-it/conventional-changelog": "^5.0.0",
-    "@tanstack/react-query": "^4.29.5",
     "@types/jest": "^28.1.2",
     "@types/react": "~17.0.21",
     "@types/react-native": "0.70.0",
-    "axios": "^1.3.5",
     "commitlint": "^17.0.2",
     "del-cli": "^5.0.0",
     "eslint": "^8.4.1",
@@ -80,8 +78,6 @@
     "@types/react": "17.0.21"
   },
   "peerDependencies": {
-    "@tanstack/react-query": "*",
-    "axios": "*",
     "react": "*",
     "react-native": "*",
     "react-native-app-auth": "*"

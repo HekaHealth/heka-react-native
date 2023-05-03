@@ -1,9 +1,6 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { HekaHealthButtons } from './components/HekaHealthButtons';
-import { AppWrapper } from './utils/AppContext';
-
-const queryClient = new QueryClient();
+import { AppWrapper } from './contexts/AppContext';
 
 interface HekaComponentProps {
   appKey: string;
@@ -12,11 +9,9 @@ interface HekaComponentProps {
 
 export const HekaComponent = ({ appKey, userUUID }: HekaComponentProps) => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AppWrapper>
-        <HekaHealthButtons appKey={appKey} userUUID={userUUID} />
-      </AppWrapper>
-    </QueryClientProvider>
+    <AppWrapper>
+      <HekaHealthButtons appKey={appKey} userUUID={userUUID} />
+    </AppWrapper>
   );
 };
 

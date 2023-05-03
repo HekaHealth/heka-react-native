@@ -23,18 +23,10 @@ export const HekaHealthButtons = ({
   appKey,
   userUUID,
 }: HekaHealthButtonsProps) => {
-  const {
-    isLoadingConnectPlatform,
-    isLoadingUserApps,
-    isLoadingConnections,
-    connections,
-    platforms,
-    state,
-    handleConnect,
-    handleDisconnect,
-  } = useHekaHealthButtons({ appKey, userUUID });
+  const { platforms, state, handleConnect, handleDisconnect } =
+    useHekaHealthButtons({ appKey, userUUID });
 
-  if (isLoadingConnections || isLoadingUserApps || isLoadingConnectPlatform) {
+  if (state.isLoading) {
     return (
       <ActivityIndicator
         size="large"
@@ -53,8 +45,10 @@ export const HekaHealthButtons = ({
           keyExtractor={(item) => item}
           ListFooterComponent={<HekaFooter error={state.error} />}
           renderItem={({ item: platformName }) => {
-            const isConnectionMissing = !connections?.[platformName];
-            const isLoggedIn = Boolean(connections?.[platformName]?.logged_in);
+            const isConnectionMissing = !state.connections?.[platformName];
+            const isLoggedIn = Boolean(
+              state.connections?.[platformName]?.logged_in
+            );
 
             return (
               <View style={styles.card}>
@@ -71,11 +65,13 @@ export const HekaHealthButtons = ({
                   </Text>
 
                   <Text style={styles.cardStatus}>
-                    {!connections?.[platformName]?.logged_in
+                    {!state.connections?.[platformName]?.logged_in
                       ? 'Logged Out'
-                      : connections[platformName]?.last_sync
+                      : state.connections[platformName]?.last_sync
                       ? `Last Synced: ${DateUtil.formatDate(
-                          new Date(connections[platformName]?.last_sync || '')
+                          new Date(
+                            state.connections[platformName]?.last_sync || ''
+                          )
                         )}`
                       : ''}
                   </Text>

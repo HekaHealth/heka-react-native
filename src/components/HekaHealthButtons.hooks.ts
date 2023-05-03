@@ -1,16 +1,13 @@
-import { useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
-import { useContext } from 'react';
-import { useConnectPlatformAPI } from '../api/connect';
-import { useGetConnectionsAPI } from '../api/getConnections';
-import { useGetUserAppsAPI } from '../api/getUserApps';
-import { QueryKeys } from '../constants/queryKeys';
+import { useContext, useEffect } from 'react';
+import { connectPlatformAPI } from '../api/connect';
+import { getConnectionsAPI } from '../api/getConnections';
+import { getUserAppsAPI } from '../api/getUserApps';
 import { useAppleHealthkit } from '../hooks/appleHealthkit';
 import { useFitbit } from '../hooks/fitbit';
 import { useGoogleFit } from '../hooks/googleFit';
 import { useStrava } from '../hooks/strava';
 import { HekaProvider, ProviderSignIn } from '../types';
-import { AppContext } from '../utils/AppContext';
+import { AppContext } from '../contexts/AppContext';
 import { getPlatforms } from '../utils/Platforms';
 import { getUniqueId } from 'react-native-device-info';
 
@@ -22,26 +19,7 @@ interface HomeParams {
 export const useHekaHealthButtons = ({ appKey, userUUID }: HomeParams) => {
   const { state, dispatch } = useContext(AppContext);
 
-  const queryClient = useQueryClient();
-
-  const { data: connectionsResponse, isLoading: isLoadingConnections } =
-    useGetConnectionsAPI({
-      appKey,
-      userUUID,
-    });
-  const { data: userAppsResponse, isLoading: isLoadingUserApps } =
-    useGetUserAppsAPI({
-      appKey,
-    });
-
-  const {
-    mutateAsync: connectPlatformAPI,
-    isLoading: isLoadingConnectPlatform,
-  } = useConnectPlatformAPI();
-
-  const connections = connectionsResponse?.data?.connections;
-  const enabledPlatforms = userAppsResponse?.data?.enabled_platforms || [];
-  const platforms = getPlatforms(connections);
+  const platforms = getPlatforms(state.connections);
 
   const { signIn: signInFitbit } = useFitbit();
   const { signIn: signInGoogleFit } = useGoogleFit();
@@ -59,13 +37,49 @@ export const useHekaHealthButtons = ({ appKey, userUUID }: HomeParams) => {
     apple_healthkit: requestAuthorizationAppleHealthkit,
   };
 
+  useEffect(() => {
+    (async () => {
+      dispatch({ type: 'SET_ISLOADING', payload: { isLoading: true } });
+
+      try {
+        const connectResult = await getConnectionsAPI({ appKey, userUUID });
+        dispatch({
+          type: 'SET_CONNECTIONS',
+          payload: { connections: connectResult.data.connections },
+        });
+      } catch (e: any) {
+        dispatch({
+          type: 'APP_ERROR',
+          payload: { error: e.message || 'Failed to fetch connections' },
+        });
+      }
+
+      try {
+        const connectResult = await getUserAppsAPI({ appKey });
+        dispatch({
+          type: 'SET_ENABLED_PLATFORMS',
+          payload: { enabledPlatforms: connectResult.data.enabled_platforms },
+        });
+      } catch (e: any) {
+        dispatch({
+          type: 'APP_ERROR',
+          payload: { error: e.message || 'Failed to fetch enabled platforms' },
+        });
+      }
+
+      dispatch({ type: 'SET_ISLOADING', payload: { isLoading: false } });
+    })();
+  }, [appKey, userUUID, dispatch]);
+
   const handleConnect = async ({
     platformName,
   }: {
     platformName: HekaProvider;
   }) => {
+    dispatch({ type: 'SET_ISLOADING', payload: { isLoading: true } });
+
     try {
-      const platform = enabledPlatforms?.find(
+      const platform = state.enabledPlatforms?.find(
         (enabledPlatform) => enabledPlatform.platform_name === platformName
       );
 
@@ -92,13 +106,18 @@ export const useHekaHealthButtons = ({ appKey, userUUID }: HomeParams) => {
 
       const deviceID = await getUniqueId();
 
-      await connectPlatformAPI({
+      const connectResult = await connectPlatformAPI({
         appKey,
         userUUID,
         platformName,
         device_id: deviceID,
         email: result.email,
         refresh_token: result.refreshToken,
+      });
+
+      dispatch({
+        type: 'SET_CONNECTIONS',
+        payload: { connections: connectResult.data.connections },
       });
 
       if (platform.platform_name === 'apple_healthkit') {
@@ -114,19 +133,14 @@ export const useHekaHealthButtons = ({ appKey, userUUID }: HomeParams) => {
           });
         }
       }
-
-      await queryClient.invalidateQueries([QueryKeys.CONNECTIONS]);
-    } catch (error) {
-      console.error(error);
-      if (axios.isAxiosError(error)) {
-        dispatch({
-          type: 'APP_ERROR',
-          payload: { error: error.response?.data?.error },
-        });
-        return;
-      }
-
-      dispatch({ type: 'APP_ERROR' });
+    } catch (e: any) {
+      console.error(e);
+      dispatch({
+        type: 'APP_ERROR',
+        payload: { error: e?.data?.error },
+      });
+    } finally {
+      dispatch({ type: 'SET_ISLOADING', payload: { isLoading: false } });
     }
   };
 
@@ -135,8 +149,10 @@ export const useHekaHealthButtons = ({ appKey, userUUID }: HomeParams) => {
   }: {
     platformName: HekaProvider;
   }) => {
+    dispatch({ type: 'SET_ISLOADING', payload: { isLoading: true } });
+
     try {
-      const platform = enabledPlatforms?.find(
+      const platform = state.enabledPlatforms?.find(
         (enabledPlatform) => enabledPlatform.platform_name === platformName
       );
 
@@ -150,7 +166,7 @@ export const useHekaHealthButtons = ({ appKey, userUUID }: HomeParams) => {
 
       const deviceID = await getUniqueId();
 
-      await connectPlatformAPI({
+      const connectResult = await connectPlatformAPI({
         appKey,
         userUUID,
         platformName,
@@ -158,31 +174,27 @@ export const useHekaHealthButtons = ({ appKey, userUUID }: HomeParams) => {
         isDisconnect: true,
       });
 
+      dispatch({
+        type: 'SET_CONNECTIONS',
+        payload: { connections: connectResult.data.connections },
+      });
+
       if (platform.platform_name === 'apple_healthkit') {
         await stopSyncingAppleHealthkit();
       }
-
-      await queryClient.invalidateQueries([QueryKeys.CONNECTIONS]);
-    } catch (error) {
-      console.error(error);
-      if (axios.isAxiosError(error)) {
-        dispatch({
-          type: 'APP_ERROR',
-          payload: { error: error.response?.data?.error },
-        });
-        return;
-      }
-
-      dispatch({ type: 'APP_ERROR' });
+    } catch (e: any) {
+      console.error(e);
+      dispatch({
+        type: 'APP_ERROR',
+        payload: { error: e?.data?.error },
+      });
+    } finally {
+      dispatch({ type: 'SET_ISLOADING', payload: { isLoading: false } });
     }
   };
 
   return {
-    isLoadingConnections,
-    isLoadingUserApps,
-    isLoadingConnectPlatform,
     state,
-    connections,
     platforms,
     handleConnect,
     handleDisconnect,

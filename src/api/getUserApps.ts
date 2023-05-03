@@ -1,11 +1,4 @@
-import {
-  QueryKey,
-  useQuery,
-  UseQueryOptions,
-  UseQueryResult,
-} from '@tanstack/react-query';
-import { api } from './index';
-import { QueryKeys } from '../constants/queryKeys';
+import { BaseURL } from '../constants';
 import { DataType, Platform } from '../types';
 
 interface Request {
@@ -35,22 +28,11 @@ interface Response {
 }
 
 export const getUserAppsAPI = async (request: Request): Promise<Response> => {
-  const result = await api.get(`/user_app_from_key`, {
-    params: {
-      key: request.appKey,
-    },
-  });
-
-  return result.data;
-};
-
-export const useGetUserAppsAPI = (
-  request: Request,
-  options?: UseQueryOptions<Response>
-): UseQueryResult<Response> => {
-  return useQuery(
-    [QueryKeys.USER_APPS, request.appKey] as QueryKey,
-    () => getUserAppsAPI(request),
-    options
+  const result = await fetch(
+    `${BaseURL}/user_app_from_key?key=${encodeURIComponent(request.appKey)}`,
+    {
+      method: 'GET',
+    }
   );
+  return await result.json();
 };
