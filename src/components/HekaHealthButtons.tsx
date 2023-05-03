@@ -64,17 +64,19 @@ export const HekaHealthButtons = ({
                     {platformsMeta[platformName].name}
                   </Text>
 
-                  <Text style={styles.cardStatus}>
-                    {!state.connections?.[platformName]?.logged_in
-                      ? 'Logged Out'
-                      : state.connections[platformName]?.last_sync
-                      ? `Last Synced: ${DateUtil.formatDate(
-                          new Date(
-                            state.connections[platformName]?.last_sync || ''
-                          )
-                        )}`
-                      : ''}
-                  </Text>
+                  {state.connections && state.connections[platformName] && (
+                    <Text style={styles.cardStatus}>
+                      {!state.connections[platformName].logged_in
+                        ? 'Logged Out'
+                        : state.connections[platformName].last_sync
+                        ? `Last Synced: ${DateUtil.formatDate(
+                            new Date(
+                              state.connections[platformName]?.last_sync || ''
+                            )
+                          )}`
+                        : ''}
+                    </Text>
+                  )}
                 </View>
 
                 <TouchableOpacity
