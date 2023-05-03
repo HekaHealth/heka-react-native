@@ -7,13 +7,13 @@ heka health plugin for react native
 #### npm
 
 ```sh
-npm install --save @heka-health/heka-react-native react-native-app-auth
+npm install --save @heka-health/heka-react-native react-native-app-auth react-native-device-info
 ```
 
 #### yarn
 
 ```sh
-yarn add @heka-health/heka-react-native react-native-app-auth
+yarn add @heka-health/heka-react-native react-native-app-auth react-native-device-info
 ```
 
 ## Setup

@@ -71,6 +71,7 @@
     "react-native": "0.71.7",
     "react-native-app-auth": "^6.4.3",
     "react-native-builder-bob": "^0.20.0",
+    "react-native-device-info": "^10.6.0",
     "release-it": "^15.0.0",
     "typescript": "^4.5.2"
   },
@@ -80,7 +81,8 @@
   "peerDependencies": {
     "react": "*",
     "react-native": "*",
-    "react-native-app-auth": "*"
+    "react-native-app-auth": "*",
+    "react-native-device-info": "*"
   },
   "engines": {
     "node": ">= 16.0.0"
@@ -155,7 +157,6 @@
     ]
   },
   "dependencies": {
-    "react-native-device-info": "^10.6.0",
     "react-native-swift": "^1.2.3"
   }
 }
