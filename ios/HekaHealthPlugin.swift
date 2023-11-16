@@ -1,14 +1,19 @@
 import Foundation
-import HekaCore
+import MetricCore
 import React
 
 @objc(HekaHealthPlugin)
 class HekaHealthPlugin: NSObject {
-  private let hekaManager = HekaManager()
+  private let hekaManager = MetricManager()
 
   @objc
-  func syncIosHealthData(_ apiKey: String, userUuid: String, lastSyncDate: Date? = nil, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
-    hekaManager.syncIosHealthData(apiKey: apiKey, userUuid: userUuid, lastSyncDate: lastSyncDate) { success in
+  func syncIosHealthData(
+    _ apiKey: String, userUuid: String, lastSyncDate: Date? = nil,
+    resolver resolve: @escaping RCTPromiseResolveBlock,
+    rejecter reject: @escaping RCTPromiseRejectBlock
+  ) {
+    hekaManager.syncIosHealthData(apiKey: apiKey, userUuid: userUuid, lastSyncDate: lastSyncDate) {
+      success in
       if success {
         resolve(true)
       } else {
@@ -18,7 +23,9 @@ class HekaHealthPlugin: NSObject {
   }
 
   @objc
-  func requestAuthorization(_ resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
+  func requestAuthorization(
+    _ resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock
+  ) {
     hekaManager.requestAuthorization { success in
       if success {
         resolve(true)
@@ -29,7 +36,9 @@ class HekaHealthPlugin: NSObject {
   }
 
   @objc
-  func stopSyncing(_ resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
+  func stopSyncing(
+    _ resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock
+  ) {
     hekaManager.stopSyncing { success in
       if success {
         resolve(true)
